@@ -1,0 +1,9 @@
+FILENAME: example.xlsx            # here is the input data
+LEGEND_NAMES: 001, 110, 111    # name of legend
+SHEET_NAMES:  001,110,111     # sheet of input data
+COLORS: black, blue, grey      # color of each pathway
+YMIN:     -2                         # optional: you can specify and will overwrite the one self-generated
+YMAX:      3                        # same as YMIN
+XLABEL:  Reaction Pathway        # xlabel for the figure
+YLABEL:  Free Eenergy $\Delta G$ (eV)       # ylabel for the figure
+OUTPUT: ./example.png             # output name for the figure
