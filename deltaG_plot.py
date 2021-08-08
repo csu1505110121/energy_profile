@@ -7,26 +7,42 @@ import pandas as pd
 import itertools
 
 class DeltaG_plot():
+	
+	default_params={
+		'LIMIT':'False',
+		'TEXTLABEL': 'True',
+		'FONTSIZE':18,
+		'FIGSIZE':(12,6),
+		'LINEW':3,
+		'DLINEW':1,
+		'XLABEL':'Reaction Pathway',
+		'YLABEL':'Free Energy (eV)',
+		'OUTPUT':'example.png'
+	}
 
-
-	def __init__(self,_x_ticks,y,color,path_labels,\
-					TextLabel='True',FontSize=18,figsize=(12,6),\
-					linew=3,dlinew=1,\
-					xlabel='Reaction Pathway',ylabel='Free Energy (eV)',\
-					output='example.png'):
+	def __init__(self,_x_ticks,y,color,path_labels,specified_params,default_params=default_params):
+		self.params = default_params.copy()
+		self.params.update(specified_params)
+		# necessary ones
 		self._x_ticks = _x_ticks
 		self.x = [i*2+1.5 for i in range(len(_x_ticks))]
 		self.y = y
 		self.color = color
-		self.TextLabel = TextLabel
-		self.fontsize=FontSize
 		self.path_labels= path_labels
-		self.figsize = figsize
-		self.linew=linew
-		self.dlinew=dlinew
-		self.xlabel = xlabel
-		self.ylabel = ylabel
-		self.output = output
+
+		# optional ones
+		self.TextLabel = self.params['TEXTLABEL']
+		self.fontsize= float(self.params['FONTSIZE'])
+		self.figsize = (int(self.params['FIGSIZE'][0]),int(self.params['FIGSIZE'][1]))
+		self.linew = float(self.params['LINEW'])
+		self.dlinew = float(self.params['DLINEW'])
+		self.xlabel = self.params['XLABEL']
+		self.ylabel = self.params['YLABEL']
+		self.output = self.params['OUTPUT']
+		self.limit = self.params['LIMIT']
+		self.ymin = float(self.params['YMIN'])
+		self.ymax = float(self.params['YMAX'])
+
 
 	def flatten(self):
 		out = list(itertools.chain.from_iterable(self.y))
@@ -40,10 +56,10 @@ class DeltaG_plot():
 		temp = [i for i in temp if i != ""] # trim the empty value
 		ymin, ymax = min(temp), max(temp)
 		
-		#return ymin, ymax
-		self.ymin = ymin
-		self.ymax = ymax
-		return self.ymin, self.ymax
+	#	#return ymin, ymax
+	#	self.ymin = ymin
+	#	self.ymax = ymax
+		return ymin, ymax
 
 	def create_canves(self):
 		f, ax = plt.subplots(figsize=self.figsize)
@@ -52,15 +68,25 @@ class DeltaG_plot():
 		#return f, ax
 
 	def set_label(self):
-		ymin,ymax = self.min_max()
-
+		if self.limit == 'True':
+			ymin = self.ymin
+			ymax = self.ymax
+		else:
+			ymin,ymax = self.min_max()
+	
+		#print(ymin,ymax)
 		y_inter = round((ymax -ymin)/5)
 
-		self.ax.set_ylim(round(ymin-y_inter,1),round(ymax+y_inter,1))
+		if self.limit == 'True':
+			self.ax.set_ylim(ymin,ymax)
+			self.ax.yaxis.set_ticks(np.arange(ymin,ymax+0.1,(ymax-ymin)/5))
+
+		else:
+			self.ax.set_ylim(round(ymin-y_inter,1),round(ymax+y_inter,1))
+			self.ax.yaxis.set_ticks(np.arange(round(ymin-y_inter,1),round(ymax+y_inter,1),y_inter))
 
 		plt.xticks(self.x, self._x_ticks,fontsize=self.fontsize)
 		#self.ax.yaxis.set_ticks(np.arange(ymin,ymax,y_inter))		
-		self.ax.yaxis.set_ticks(np.arange(round(ymin-y_inter,1),round(ymax+y_inter,1),y_inter))
 
 		# set the labelsize for x and y axis
 		self.ax.xaxis.set_tick_params(labelsize=16)
