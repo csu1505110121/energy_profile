@@ -11,13 +11,16 @@ def read_inp(filename='input.txt'):
 			if not line:
 				break
 			else:
-				var = line.split(":")[0]
-				val = line.split('#')[0].split(":")[1].strip().split(',')
-		#		print(var,':',val)
-				if len(val) ==1:
-					data[var]=val[0]
-				elif len(val) >1:
-					data[var] = [x.strip() for x in val]
+				line = line.strip()
+				# trim the empty line and comment lines
+				if len(line) !=0 and '*' not in line and '#' != line[0]:
+					var = line.split(":")[0]
+					val = line.split('#')[0].split(":")[1].strip().split(',')
+			#		print(var,':',val)
+					if len(val) ==1:
+						data[var]=val[0]
+					elif len(val) >1:
+						data[var] = [x.strip() for x in val]
 
 	return data
 
